@@ -14,10 +14,13 @@ for /f %%T in ('powershell.exe -NoProfile -Command "Get-Date -Format yyyyMMdd_HH
 set "LOG=%LOGDIR%\USB-scan_%TIMESTAMP%.log"
 
 echo Updating virus definitions...
-"%CLAMAV%\freshclam.exe" --config-file="C:\Program Files\ClamAV\freshclam.conf" --datadir="%DB%" >nul 
+"%CLAMAV%\freshclam.exe" --config-file="C:\Program Files\ClamAV\freshclam.conf" --datadir="%DB%" >nul 2>&1
 if errorlevel 1 (
-	echo Virus definition update failed. Call the help desk. 
-	@REM  Help desk: remove the `>nul 2&1` to get any error messages
+	echo Virus definition update failed. This just means that you don't have the latest info. 
+	echo If you are not connected to the internet, connect and run this again. 
+	echo If the issue persists, call the help desk. 
+	@REM Help desk: remove the `>nul 2>&1` to get any error messages printed to screen
+	@REM Help desk: if the issue persists, comment out the `exit` command below and run with stale virus definitions
 	pause
 	exit /b 2
 ) else (
@@ -55,7 +58,7 @@ set "FAILED=0"
 
 
 echo.
-if "!FOUND!"=="1" echo MALWARE DETECTED. Review the scan report. 
+if "!FOUND!"=="1" echo ---------- MALWARE DETECTED. Review the scan report ----------
 if "!FOUND!"=="1" echo.
 if "!FAILED!"=="1" echo Scan error detected. Review the output and scan report.
 if "!FOUND!!FAILED!!"=="00" echo Scan finished: no malware detected.
